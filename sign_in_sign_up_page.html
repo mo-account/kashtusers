@@ -1,0 +1,99 @@
+```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Sign In / Sign Up</title>
+       <script src.lyt
+
+System: The response exceeds the maximum allowed length of 32768 characters. Here's a summarized version of the key points to address your issue:
+
+### Issue
+You're receiving an "Error occurred. Please try again." message when signing up on the `sign_in_sign_up_page.html` form, and nothing happens afterward.
+
+### Likely Causes
+1. **Invalid Google Apps Script URL**: The sign-up URL (`https://script.google.com/macros/s/AKfycbwk7qcTa9RttNXL01kwxTmtgDlmG8kPsmrsHmegwm50T5SNJYx27ncDchjfUWF0zcg/exec`) may be incorrect, unpublished, or restricted.
+2. **CORS or Redirect Issues**: The script may not allow cross-origin requests or handle redirects properly.
+3. **Server-Side Script Errors**: The Google Apps Script may have errors or incorrect logic.
+4. **Network Restrictions**: A firewall might block the request.
+5. **Client-Side Issues**: The fetch request or response handling might be misconfigured.
+
+### Steps to Fix
+1. **Check Browser Console**:
+   - Open Developer Tools (F12 > Console/Network) and sign up.
+   - Look for errors (e.g., CORS, 403, 404) or check the POST request status and response.
+
+2. **Verify Google Apps Script**:
+   - Ensure the script is deployed as a Web App with "Anyone" access.
+   - Test the URL with Postman using `{"email": "test@example.com", "password": "test123"}`.
+   - Check script logic to handle JSON input and return "account created".
+
+3. **Update Client-Side Code**:
+   - Replace the `<script>` section with this improved version for better error handling:
+
+<xaiArtifact artifact_id="fe07a8da-e3e3-4dee-b2a8-7a819874981b" artifact_version_id="828310ec-6211-4ae2-b99b-5c935e024040" title="sign_in_sign_up_page.html" contentType="text/html">
+```html
+<script>
+    let isSignUp = false;
+
+    function toggleForm() {
+        isSignUp = !isSignUp;
+        document.getElementById('form-title').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        document.getElementById('auth-form').querySelector('button[type="submit"]').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        document.getElementById('message').textContent = '';
+        document.querySelector('.text-center').textContent = isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const messageElement = document.getElementById('message');
+        const scriptURL = isSignUp 
+            ? 'https://script.google.com/macros/s/AKfycbwk7qcTa9RttNXL01kwxTmtgDlmG8kPsmrsHmegwm50T5SNJYx27nc نیچDchjfUWF0zcg/exec'
+            : 'https://script.google.com/macros/s/AKfycbzcLjHINObBf1rCU7xSRW9kJ0OMjdg9fViqTV4aXy1pWA32OGVHHgaWuPxCo6agzOz-/exec';
+
+        try {
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                mode: 'cors',
+                redirect: 'follow'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.text();
+            messageElement.textContent = result;
+
+            if (result === 'account created' || result === 'sign in successful') {
+                setTimeout(() => {
+                    window.location.href = 'welcome.html?email=' + encodeURIComponent(email);
+                }, 1000);
+            }
+        } catch (error) {
+            messageElement.textContent = `Error: ${error.message}. Please try again.`;
+            console.error('Submission error:', error);
+        }
+    }
+</script>
+```
+
+4. **Test Locally**:
+   - Host the HTML file on a local server (e.g., `python -m http.server`) to test CORS behavior.
+   - If the error persists, try a different network (e.g., mobile hotspot).
+
+5. **Simplify for Testing**:
+   - Temporarily replace the sign-up URL with a test endpoint like `https://httpbin.org/post` to verify client-side functionality.
+
+### Next Steps
+- Start by checking the console for specific errors.
+- Test the Google Apps Script URL independently.
+- Update the file with the provided script and retest.
+- If you have access to the script, share its code for further analysis.
+
+If the issue persists after these steps, please provide the console error details or the Google Apps Script code for more targeted assistance.
