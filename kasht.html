@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة تحديد عرض الكشط و الإعادة</title>
+    <style>
+        @font-face {
+            font-family: 'MCS Taybah S_U';
+            src: url('https://fonts.cdnfonts.com/s/12345/MCS_Taybah_S_U_normal.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 20px;
+        }
+        table {
+            width: 95%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th {
+            font-weight: bold;
+            text-align: center;
+        }
+        /* Background colors for 2nd header row */
+        thead tr:nth-child(2) th:nth-child(-n+1) { background-color: #FFF2cC; }
+        thead tr:nth-child(2) th:nth-child(n+2):nth-child(-n+2) { background-color: #D3D3D3; }
+        thead tr:nth-child(2) th:nth-child(n+3):nth-child(-n+3) { background-color: #F4B084; }
+        thead tr:nth-child(2) th:nth-child(n+4):nth-child(-n+4) { background-color: #C6E0B4; }
+        thead tr:nth-child(2) th:nth-child(5) { background-color: #FFFFFF; }
+        /* Background colors for 3rd header row */
+        thead tr:nth-child(3) th:nth-child(-n+2) { background-color: #FFF2CC; }
+        thead tr:nth-child(3) th:nth-child(n+3):nth-child(-n+7) { background-color: #D3D3D3; }
+        thead tr:nth-child(3) th:nth-child(n+8):nth-child(-n+9) { background-color: #F4B084; }
+        thead tr:nth-child(3) th:nth-child(n+10):nth-child(-n+12) { background-color: #C6E0B4; }
+        thead tr:nth-child(3) th:nth-child(12) { background-color: #FFFFFF; }
+        /* Apply font and size to second and third header rows */
+        thead tr:nth-child(2), thead tr:nth-child(3) {
+            font-family: 'MCS Taybah S_U', Arial, sans-serif;
+            font-size: 22px;
+            font-weight: normal;
+        }
+        tr:nth-child(even) {background-color: #f9f9f9;}
+        tr:hover {background-color: #f9f9f9;}
+        select, input[type="number"] {
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .millingWidth {
+            color: red;
+        }
+        /* Column width adjustments */
+        th:nth-child(2), td:nth-child(2) { width: 5%; }
+        th:nth-child(3), td:nth-child(3) { width: 10%; }
+        th:nth-child(5), td:nth-child(5) { width: 5%; }
+        th:nth-child(6), td:nth-child(6) { width: 10%; }
+        th:nth-child(7), td:nth-child(7) { width: 8%; }
+        th:nth-child(9), td:nth-child(9) { width: 5%; }
+        th:nth-child(10), td:nth-child(10) { width: 5%; }
+        th:nth-child(11), td:nth-child(11) { width: 10%; }
+        th:nth-child(12), td:nth-child(12) { width: 10%; }
+        /* Background colors for data rows */
+        tr:nth-child(n+1):nth-child(-n+12) td:nth-child(-n+2) { background-color: #FFF2CC; }
+        tr:nth-child(n+1):nth-child(-n+12) td:nth-child(n+3):nth-child(-n+7) { background-color: #D3D3D3; }
+        tr:nth-child(n+1):nth-child(-n+12) td:nth-child(n+8):nth-child(-n+9) { background-color: #F4B084; }
+        tr:nth-child(n+1):nth-child(-n+12) td:nth-child(n+10):nth-child(-n+12) { background-color: #C6E0B4; }
+        /* Merged row styling */
+        .merged-row td {
+            background-color: #FFFF00;
+            color: #FF0000;
+            font-family: 'Segoe UI Semibold', 'Segoe UI', sans-serif;
+            font-size: 25px;
+            font-weight: 600;
+            text-align: center;
+        }
+        /* Irrelevant cells (blacked out) */
+        .irrelevant {
+            background-color: #000000 !important;
+            color: #FFFFFF;
+        }
+        /* Missing critical field (red border) */
+        .missing-critical {
+            border: 2px solid red !important;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        .clear-button, .calculate-button {
+            display: inline-block;
+            margin: 10px 20px;
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .clear-button {
+            background-color: #ff4444;
+        }
+        .clear-button:hover {
+            background-color: #cc0000;
+        }
+        .calculate-button {
+            background-color: #4CAF50;
+        }
+        .calculate-button:hover {
+            background-color: #45a049;
+        }
+        .button-container {
+            text-align: center;
+        }
+        #usageCounter {
+            font-size: 16px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <h1>أداة تحديد عرض الكشط و الإعادة وفقاً للدليل الشامل للبنية التحتية</h1>
+    <h2>24-7-2025 | محمد شعبان</h2>
+    <h3 id="welcomeMessage">مرحباً, المستخدم</h3>
+    <div class="button-container">
+        <button class="clear-button" onclick="clearAll()">مسح جميع البيانات</button>
+        <button class="calculate-button" onclick="calculateAll()">حساب عرض الكشط و الإعادة</button>
+        <span id="usageCounter">0</span>
+    </div>
+    <table id="dataTable">
+        <thead>
+            <tr class="merged-row">
+                <td colspan="13">الأداة مجرد وسيلة مساعدة ولا تغني عن الدليل و في حال تعارضها مع الدليل يطبق الدليل</td>
+            </tr>
+            <tr>
+                <th colspan="2">بيانات المقطع</th>
+                <th colspan="5">بيانات الشارع</th>
+                <th colspan="2">بيانات حفرية الشركة</th>
+                <th colspan="3">بيانات الحفرية القديمة</th>
+                <th rowspan="1">عرض الكشط و الإعادة</th>
+            </tr>
+            <tr>
+                <th>رقم المقطع</th>
+                <th>طول المقطع</th>
+                <th>فئة الشارع</th>
+                <th>نوع الشارع</th>
+                <th>عرض الشارع</th>
+                <th>عدد فواصل الربط الطولية</th>
+                <th>إتجاه ميل الطريق</th>
+                <th>عرض حفرية الشركة</th>
+                <th>بعد حد القص عن الرصيف</th>
+                <th>هل يوجد حفرية قديمة</th>
+                <th>بعد حد القص عن الحفرية القديمة</th>
+                <th>عرض الحفرية القديمة</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><input type="number" class="sectionLength" value="100" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value=""></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة" selected>مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value=""></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي" selected>فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="10" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="0.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="1" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><input type="number" class="sectionLength" value="100" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="14" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="0.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="1.6" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="1.3" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="1.5" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><input type="number" class="sectionLength" value="70" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="0.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="1.9" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="1.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><input type="number" class="sectionLength" value="120" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="13" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="0.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="1.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="1.5" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="1.5" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><input type="number" class="sectionLength" value="150" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="10" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="0.2" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="1.5" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><input type="number" class="sectionLength" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><input type="number" class="sectionLength" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><input type="number" class="sectionLength" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><input type="number" class="sectionLength" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td><input type="number" class="sectionLength" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="streetCategory" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="أ">أ</option>
+                    <option value="ب">ب</option>
+                    <option value="مطورة <سنة">مطورة <سنة</option>
+                </select></td>
+                <td><select class="streetType" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="رئيسي">رئيسي</option>
+                    <option value="فرعي">فرعي</option>
+                    <option value="تقاطع">تقاطع</option>
+                </select></td>
+                <td><input type="number" class="streetWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="jointCount" value="" step="1" onchange="updateFormatting(this)"></td>
+                <td><select class="slopeDirection" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="جهة اليمين">جهة اليمين</option>
+                    <option value="جهة اليسار">جهة اليسار</option>
+                    <option value="للجهتين">للجهتين</option>
+                    <option value="طولي">طولي</option>
+                </select></td>
+                <td><input type="number" class="excavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="distanceToCurb" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><select class="oldExcavation" onchange="updateFormatting(this)">
+                    <option value="" selected></option>
+                    <option value="نعم">نعم</option>
+                    <option value="لا">لا</option>
+                </select></td>
+                <td><input type="number" class="distanceToOldExcavation" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td><input type="number" class="oldExcavationWidth" value="" step="0.1" onchange="updateFormatting(this)"></td>
+                <td class="millingWidth"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        // Apps Script web app URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQhXZ2XsWDEQgjAaSXM5X43VWmjerPaXo1J2bOWQ1T6rTiuAGYVxLhaFJA9EWmgLNJcw/exec';
+
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
+        function applyConditionalFormatting(row) {
+            const streetCategory = row.querySelector('.streetCategory').value || '';
+            const streetType = row.querySelector('.streetType').value || '';
+            const streetWidth = row.querySelector('.streetWidth').value || '';
+            const slopeDirection = row.querySelector('.slopeDirection').value || '';
+            const oldExcavation = row.querySelector('.oldExcavation').value || '';
+            const cells = row.querySelectorAll('td');
+            const inputCells = row.querySelectorAll('td input, td select');
+
+            // Reset all cells to remove irrelevant and missing-critical classes
+            cells.forEach(cell => cell.classList.remove('irrelevant', 'missing-critical'));
+            inputCells.forEach(input => input.classList.remove('irrelevant', 'missing-critical'));
+
+            // If streetCategory or streetType is empty, highlight them
+            if (!streetCategory || !streetType) {
+                if (!streetCategory) row.querySelector('.streetCategory').classList.add('missing-critical');
+                if (!streetType) row.querySelector('.streetType').classList.add('missing-critical');
+                return;
+            }
+
+            // Define column indices (1-based to match Excel, adjusted for 0-based in JS)
+            const colMap = {
+                sectionLength: 2, // B
+                streetCategory: 3, // C
+                streetType: 4, // D
+                streetWidth: 5, // E
+                jointCount: 6, // F
+                slopeDirection: 7, // G
+                excavationWidth: 8, // H
+                distanceToCurb: 9, // I
+                oldExcavation: 10, // J
+                distanceToOldExcavation: 11, // K
+                oldExcavationWidth: 12 // L
+            };
+
+            // Determine required fields and irrelevant columns
+            let requiredFields = ['streetCategory', 'streetType'];
+            let irrelevantColumns = [];
+            if (streetCategory === 'مطورة <سنة' && streetType === 'فرعي') {
+                requiredFields.push('streetWidth');
+                irrelevantColumns = [6, 7, 8, 9, 10, 11, 12]; // F, G, H, I, J, K, L
+            } else if (streetCategory === 'مطورة <سنة' && streetType === 'رئيسي') {
+                irrelevantColumns = [5, 6, 7, 8, 9, 10, 11, 12]; // E, F, G, H, I, J, K, L
+            } else if (streetCategory === 'مطورة <سنة' && streetType === 'تقاطع') {
+                irrelevantColumns = [5, 6, 7, 8, 9, 10, 11, 12]; // E, F, G, H, I, J, K, L
+            } else if (streetCategory === 'أ' && streetType === 'رئيسي') {
+                requiredFields.push('excavationWidth', 'distanceToCurb');
+                irrelevantColumns = [5, 6, 7, 10, 11, 12]; // E, F, G, J, K, L
+            } else if (streetCategory === 'أ' && streetType === 'فرعي') {
+                requiredFields.push('streetWidth', 'slopeDirection');
+                irrelevantColumns = [10, 11, 12]; // J, K, L
+            } else if (streetCategory === 'أ' && streetType === 'تقاطع') {
+                irrelevantColumns = [5, 6, 7, 8, 9, 10, 11, 12]; // E, F, G, H, I, J, K, L
+            } else if (streetCategory === 'ب' && streetType === 'تقاطع') {
+                requiredFields.push('excavationWidth');
+                irrelevantColumns = [5, 6, 7, 9, 10, 11, 12]; // E, F, G, I, J, K, L
+            } else if (streetCategory === 'ب' && streetType !== 'تقاطع') {
+                requiredFields.push('excavationWidth', 'distanceToCurb', 'oldExcavation');
+                if (oldExcavation === 'نعم') {
+                    requiredFields.push('distanceToOldExcavation', 'oldExcavationWidth');
+                }
+                irrelevantColumns = [5, 6, 7]; // E, F, G
+            }
+
+            // Apply irrelevant class to specified columns
+            irrelevantColumns.forEach(col => {
+                const cell = cells[col - 1];
+                const input = cell.querySelector('input, select');
+                cell.classList.add('irrelevant');
+                if (input) input.classList.add('irrelevant');
+            });
+
+            // Highlight missing critical fields in red
+            let missingFields = requiredFields.filter(field => !row.querySelector(`.${field}`).value);
+            missingFields.forEach(field => {
+                const input = row.querySelector(`.${field}`);
+                if (input) input.classList.add('missing-critical');
+            });
+        }
+
+        function updateFormatting(element) {
+            const row = element.closest('tr');
+            applyConditionalFormatting(row);
+        }
+
+        function updateRow(row) {
+            const streetCategory = row.querySelector('.streetCategory').value || '';
+            const streetType = row.querySelector('.streetType').value || '';
+            const streetWidth = parseFloat(row.querySelector('.streetWidth').value) || 0;
+            const jointCount = parseFloat(row.querySelector('.jointCount').value) || 0;
+            const slopeDirection = row.querySelector('.slopeDirection').value || '';
+            const excavationWidth = parseFloat(row.querySelector('.excavationWidth').value) || 0;
+            const distanceToCurb = parseFloat(row.querySelector('.distanceToCurb').value) || 0;
+            const oldExcavation = row.querySelector('.oldExcavation').value || '';
+            const distanceToOldExcavation = parseFloat(row.querySelector('.distanceToOldExcavation').value) || 0;
+            const oldExcavationWidth = parseFloat(row.querySelector('.oldExcavationWidth').value) || 0;
+            const millingWidthCell = row.querySelector('.millingWidth');
+
+            // Determine required fields based on streetCategory and streetType
+            let requiredFields = ['streetCategory', 'streetType'];
+            if (streetCategory === 'مطورة <سنة' && streetType === 'فرعي') {
+                requiredFields.push('streetWidth');
+            } else if (streetCategory === 'مطورة <سنة' && streetType === 'رئيسي') {
+                // No additional fields
+            } else if (streetCategory === 'مطورة <سنة' && streetType === 'تقاطع') {
+                // No additional fields
+            } else if (streetCategory === 'أ' && streetType === 'رئيسي') {
+                requiredFields.push('excavationWidth', 'distanceToCurb');
+            } else if (streetCategory === 'أ' && streetType === 'فرعي') {
+                requiredFields.push('streetWidth', 'slopeDirection');
+            } else if (streetCategory === 'أ' && streetType === 'تقاطع') {
+                // No additional fields
+            } else if (streetCategory === 'ب' && streetType === 'تقاطع') {
+                requiredFields.push('excavationWidth');
+            } else if (streetCategory === 'ب' && streetType !== 'تقاطع') {
+                requiredFields.push('excavationWidth', 'distanceToCurb', 'oldExcavation');
+                if (oldExcavation === 'نعم') {
+                    requiredFields.push('distanceToOldExcavation', 'oldExcavationWidth');
+                }
+            }
+
+            // Check if all required fields are filled
+            let missingFields = requiredFields.filter(field => !row.querySelector(`.${field}`).value);
+            if (missingFields.length > 0) {
+                millingWidthCell.textContent = '';
+                applyConditionalFormatting(row);
+                return;
+            }
+
+            // Calculate Column T
+            let millingWidthT = '';
+            try {
+                if (jointCount > 0 && streetCategory === 'أ' && streetType === 'فرعي' && (excavationWidth + distanceToCurb) < (streetWidth / jointCount)) {
+                    millingWidthT = streetWidth / jointCount;
+                } else if (jointCount > 0 && streetCategory === 'أ' && streetType === 'فرعي' && (excavationWidth + distanceToCurb) > (streetWidth / jointCount)) {
+                    millingWidthT = 2 * (streetWidth / jointCount);
+                }
+            } catch (e) {
+                millingWidthT = '';
+            }
+
+            // Calculate Column S
+            let millingWidthS = '';
+            try {
+                if (jointCount === 0) {
+                    if (streetCategory === 'أ' && streetType === 'فرعي' && slopeDirection === 'طولي' && (excavationWidth + distanceToCurb) <= 3.65) {
+                        millingWidthS = 3.65;
+                    } else if (streetCategory === 'أ' && streetType === 'فرعي' && slopeDirection === 'طولي' && (excavationWidth + distanceToCurb) > 3.65) {
+                        millingWidthS = 2 * 3.65;
+                    } else if (streetCategory === 'أ' && streetType === 'فرعي' && (slopeDirection === 'جهة اليمين' || slopeDirection === 'جهة اليسار')) {
+                        millingWidthS = streetWidth;
+                    } else if (streetCategory === 'أ' && streetType === 'فرعي' && slopeDirection === 'للجهتين') {
+                        millingWidthS = streetWidth / 2;
+                    }
+                } else if (jointCount > 0) {
+                    millingWidthS = millingWidthT;
+                }
+            } catch (e) {
+                millingWidthS = '';
+            }
+
+            // Calculate Column R
+            let millingWidthR = '';
+            try {
+                if ((streetCategory === 'أ' || streetCategory === 'مطورة <سنة') && streetType === 'رئيسي' && (excavationWidth + distanceToCurb) <= 3.65) {
+                    millingWidthR = 3.65;
+                } else if ((streetCategory === 'أ' || streetCategory === 'مطورة <سنة') && streetType === 'رئيسي' && (excavationWidth + distanceToCurb) > 3.65) {
+                    millingWidthR = 2 * 3.65;
+                } else if (streetCategory === 'أ' && streetType === 'فرعي') {
+                    millingWidthR = millingWidthS;
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb < 3.65 / 2 && oldExcavation === 'لا') {
+                    millingWidthR = Math.max(3.65, excavationWidth + distanceToCurb);
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb > 3.65 / 2 && oldExcavation === 'لا') {
+                    millingWidthR = excavationWidth + 1;
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb < 3.65 / 2 && oldExcavation === 'نعم' && distanceToOldExcavation < 3.65 / 2) {
+                    millingWidthR = Math.max(3.65, excavationWidth + distanceToCurb + distanceToOldExcavation + oldExcavationWidth);
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb < 3.65 / 2 && oldExcavation === 'نعم' && distanceToOldExcavation > 3.65 / 2) {
+                    millingWidthR = Math.max(3.65, excavationWidth + distanceToCurb);
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb > 3.65 / 2 && oldExcavation === 'نعم' && distanceToOldExcavation > 3.65 / 2) {
+                    millingWidthR = excavationWidth + 1;
+                } else if (streetType !== 'تقاطع' && streetCategory === 'ب' && distanceToCurb > 3.65 / 2 && oldExcavation === 'نعم' && distanceToOldExcavation < 3.65 / 2) {
+                    millingWidthR = Math.max(3.65, excavationWidth + oldExcavationWidth + distanceToOldExcavation);
+                } else if (streetCategory === 'مطورة <سنة' && streetType === 'فرعي') {
+                    millingWidthR = streetWidth;
+                } else if (streetCategory === 'مطورة <سنة' && streetType === 'رئيسي') {
+                    millingWidthR = 3.65;
+                } else if (streetType === 'تقاطع' && (streetCategory === 'أ' || streetCategory === 'مطورة <سنة')) {
+                    millingWidthR = 10;
+                } else if (streetType === 'تقاطع' && streetCategory === 'ب') {
+                    millingWidthR = excavationWidth + 1;
+                }
+            } catch (e) {
+                millingWidthR = '';
+            }
+
+            // Calculate Column M
+            let millingWidth = '';
+            try {
+                if (millingWidthR > 3 && millingWidthR < 3.65) {
+                    millingWidth = 3.65;
+                } else {
+                    millingWidth = millingWidthR;
+                }
+            } catch (e) {
+                millingWidth = '';
+            }
+
+            // Update cell
+            millingWidthCell.textContent = millingWidth !== '' ? millingWidth.toFixed(2) : '';
+
+            // Apply conditional formatting
+            applyConditionalFormatting(row);
+        }
+
+        function clearAll() {
+            document.querySelectorAll('#dataTable tbody input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('#dataTable tbody select').forEach(select => {
+                select.value = '';
+            });
+            document.querySelectorAll('#dataTable tbody .millingWidth').forEach(cell => {
+                cell.textContent = '';
+            });
+            // Reapply conditional formatting for all rows
+            document.querySelectorAll('#dataTable tbody tr').forEach(row => {
+                applyConditionalFormatting(row);
+            });
+        }
+
+        function calculateAll() {
+            // Perform calculations
+            document.querySelectorAll('#dataTable tbody tr').forEach(row => {
+                updateRow(row);
+            });
+
+            // Update usage counter
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+            if (email) {
+                const counter = document.getElementById('usageCounter');
+                let currentCount = parseInt(counter.textContent) || 0;
+                counter.textContent = currentCount + 1;
+
+                // Send POST request to update usage count
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error updating usage:', data.error);
+                        counter.textContent = currentCount; // Revert on error
+                    } else {
+                        counter.textContent = data.usage; // Ensure sync
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    counter.textContent = currentCount; // Revert on error
+                });
+            }
+        }
+
+        // Fetch initial usage count and apply conditional formatting on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set welcome message with email from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            welcomeMessage.textContent = email ? `مرحباً, ${email}` : 'مرحباً, المستخدم';
+
+            // Fetch initial usage count
+            if (email) {
+                fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(email)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error fetching usage:', data.error);
+                            document.getElementById('usageCounter').textContent = '0';
+                        } else {
+                            document.getElementById('usageCounter').textContent = data.usage;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        document.getElementById('usageCounter').textContent = '0';
+                    });
+            }
+
+            // Apply initial conditional formatting for all rows
+            document.querySelectorAll('#dataTable tbody tr').forEach(row => {
+                applyConditionalFormatting(row);
+            });
+        });
+    </script>
+</body>
+</html>
