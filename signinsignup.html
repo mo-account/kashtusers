@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In / Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 600px;
+            margin: 30px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 3px solid #ccc;
+            margin-bottom: 30px;
+        }
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            background-color: #f5f5f5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+        .tab:hover {
+            background-color: #e0e0e0;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: red;
+        }
+        .note {
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                max-width: 90%;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .tab {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            label {
+                font-size: 1.1rem;
+            }
+            input, button {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            #message {
+                font-size: 1rem;
+            }
+            .note {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sign In / Sign Up</h2>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('signup')">Sign Up</div>
+            <div class="tab" onclick="showTab('signin')">Sign In</div>
+        </div>
+        <div id="signup" class="tab-content active">
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signup-username">Email</label>
+                    <input type="text" id="signup-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <button type="button" onclick="signUp()">Sign Up</button>
+            </form>
+        </div>
+        <div id="signin" class="tab-content">
+            <form id="signinForm">
+                <div class="form-group">
+                    <label for="signin-username">Email</label>
+                    <input type="text" id="signin-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" name="password" required>
+                </div>
+                <button type="button" onclick="signIn()">Sign In</button>
+            </form>
+        </div>
+        <div id="message"></div>
+        <div class="note">
+            Host on a server (e.g., python -m http.server) or Firebase Hosting for accurate error handling (e.g., Wrong email, Wrong password, Email already registered).
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcITUcPHJp6ns0ErlSw7P04ZTsc6fFsZUepZTosfLx-oSXpTKfHmneezZ7ut68DcWS/exec";
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('message').innerText = '';
+        }
+
+        async function signUp() {
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!username || !password) {
+                messageDiv.innerText = 'Email and password are required';
+                return;
+            }
+
+            try {
+                const checkResponse = await fetch(
+                    `${SCRIPT_URL}?action=checkuser&username=${encodeURIComponent(username)}`,
+                    { method: 'GET', mode: 'cors' }
+                );
+                const checkResult = await checkResponse.json();
+                console.log('Check user response:', checkResult);
+                if (checkResult.message === 'Username exists') {
+                    messageDiv.innerText = 'Email is already registered, sign in instead';
+                    setTimeout(() => showTab('signin'), 1500);
+                    return;
+                }
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'signup', username, password })
+                });
+                const result = await response.json();
+                console.log('Sign-up response:', result);
+                if (result.message === 'Sign-up successful') {
+                    messageDiv.innerText = 'Successfully signed up';
+                    setTimeout(() => {
+                        window.location.href = 'kasht.html?email=' + encodeURIComponent(username);
+                    }, 1000);
+                } else {
+                    messageDiv.innerText = result.message;
+                }
+            } catch (error) {
+                console.error('Sign-up error:', error);
+                messageDiv.innerText = 'Error during sign-up: ' + error.message;
+            }
+        }
+
+        async function signIn() {
+            const username = document.getElementById('signin-username').value;
+            const password = document.getElementById('signin-password').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!username || !password) {
+                messageDiv.innerText = 'Email and password are required';
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=signin&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+                    {
+                        method: 'GET',
+                        mode: 'cors'
+                    }
+                );
+                const result = await response.json();
+                console.log('Sign-in response:', result);
+                if (result.message === 'Sign-in successful') {
+                    messageDiv.innerText = 'Successfully signed in';
+                    setTimeout(() => {
+                        window.location.href = 'kasht.html?email=' + encodeURIComponent(username);
+                    }, 1000);
+                } else {
+                    messageDiv.innerText = result.message; // Displays 'Wrong email' or 'Wrong password'
+                    if (result.message === 'Wrong email') {
+                        setTimeout(() => showTab('signup'), 1500);
+                    }
+                }
+            } catch (error) {
+                console.error('Sign-in error:', error);
+                messageDiv.innerText = 'Error during sign-in: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
