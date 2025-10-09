@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Send Data to Google Apps Script</title>
+</head>
+<body>
+  <h2>Testing Fetch to Google Apps Script</h2>
+  <p>Sending data...</p>
+  <div id="result"></div>
+
+  <script>
+  async function sendData() {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get("email");
+    const boq = params.get("boq");
+
+    const targetURL = "https://script.google.com/macros/s/AKfycbyNXJM9_NytXrhe_xkVLRZ9HO6eci9D57QaVdCKBRFOIv9_L6o-l9Y-NZ5DTns8ALVNnQ/exec"; // Replace with your actual Apps Script URL
+
+    const payload = { email: email, boq: boq, time: new Date().toISOString() };
+
+    try {
+      const res = await fetch(targetURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      document.getElementById("result").textContent = "Success: " + JSON.stringify(data);
+    } catch (err) {
+      document.getElementById("result").textContent = "Error: " + err.message;
+    }
+  }
+
+  sendData();
+  </script>
+</body>
+</html>
