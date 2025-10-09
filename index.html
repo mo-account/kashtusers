@@ -2,32 +2,40 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Send Data to Google Apps Script (GET)</title>
+  <title>Send Data to Google Apps Script</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; }
+    #result { margin-top: 20px; font-weight: bold; color: green; }
+  </style>
 </head>
 <body>
   <h2>Testing Fetch to Google Apps Script</h2>
-  <p>Sending data...</p>
+  <p>Sending <span id="info"></span>...</p>
   <div id="result"></div>
 
   <script>
-  async function sendData() {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get("email");
-    const boq = params.get("boq");
+    async function sendData() {
+      const params = new URLSearchParams(window.location.search);
+      const email = params.get("email") || "test@example.com";
+      const boq = params.get("boq") || "5";
 
-    const targetURL = "https://script.google.com/macros/s/AKfycbzEUkNMAe_Q7J3H-zZHZ3ONgworABJaoPPTcbIhWU7-a1m7gRYVmyT49zDjyVGUegBBuA/exec" +
-      "?email=" + encodeURIComponent(email) + "&boq=" + encodeURIComponent(boq);
+      document.getElementById("info").textContent = `email=${email}, boq=${boq}`;
 
-    try {
-      const res = await fetch(targetURL);
-      const text = await res.text();
-      document.getElementById("result").textContent = "Success: " + text;
-    } catch (err) {
-      document.getElementById("result").textContent = "Error: " + err.message;
+      // ⬇️ Replace this with your "googleusercontent.com" URL
+      const appURL = "https://script.google.com/macros/s/AKfycbxc2vnOENMxXJi-ShiwJrPzb1qr7XPYGTjtirTZAH07x4x8ywMb9bOYYs1MUrjQEpT1DQ/exec";
+
+      const target = `${appURL}?email=${encodeURIComponent(email)}&boq=${encodeURIComponent(boq)}`;
+
+      try {
+        const res = await fetch(target);
+        const text = await res.text();
+        document.getElementById("result").textContent = "✅ Success: " + text;
+      } catch (err) {
+        document.getElementById("result").textContent = "❌ Error: " + err.message;
+      }
     }
-  }
 
-  sendData();
+    sendData();
   </script>
 </body>
 </html>
