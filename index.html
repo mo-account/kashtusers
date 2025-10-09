@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Send Data to Google Apps Script</title>
+  <title>Send Data to Google Apps Script (GET)</title>
 </head>
 <body>
   <h2>Testing Fetch to Google Apps Script</h2>
@@ -15,18 +15,13 @@
     const email = params.get("email");
     const boq = params.get("boq");
 
-    const targetURL = "https://script.google.com/macros/s/AKfycbw7YSR5kFE3kNBI7E00pLoqOgv2fz5LY_lRu1eIHwcrtMOTjApcdlWzRUr8kPcXPHG9hg/exec"; // Replace with your actual Apps Script URL
-
-    const payload = { email: email, boq: boq, time: new Date().toISOString() };
+    const targetURL = "https://script.google.com/macros/s/AKfycbzEUkNMAe_Q7J3H-zZHZ3ONgworABJaoPPTcbIhWU7-a1m7gRYVmyT49zDjyVGUegBBuA/exec" +
+      "?email=" + encodeURIComponent(email) + "&boq=" + encodeURIComponent(boq);
 
     try {
-      const res = await fetch(targetURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      document.getElementById("result").textContent = "Success: " + JSON.stringify(data);
+      const res = await fetch(targetURL);
+      const text = await res.text();
+      document.getElementById("result").textContent = "Success: " + text;
     } catch (err) {
       document.getElementById("result").textContent = "Error: " + err.message;
     }
